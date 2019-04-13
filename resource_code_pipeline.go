@@ -427,6 +427,13 @@ func flattenAwsCodePipelineActionsInputArtifacts(artifacts []*codepipeline.Input
 }
 
 func resourceCodePipelineRead(d *schema.ResourceData, meta interface{}) error {
+	stages := d.Get("stage").([]interface{})
+	stateStages := []interface{}{}
+
+	for _, stage := range stages {
+		stateStages = append(stateStages, stage)
+	}
+
 	conn := meta.(*AWSClient).codepipelineconn
 	resp, err := conn.GetPipeline(&codepipeline.GetPipelineInput{
 		Name: aws.String(d.Id()),
@@ -449,6 +456,27 @@ func resourceCodePipelineRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if err := d.Set("stage", flattenAwsCodePipelineStages(pipeline.Stages)); err != nil {
+		return err
+	}
+
+	finalStages := []interface{}{}
+	pipelineStages := d.Get("stage").([]interface{})
+	for _, stateStage := range stateStages {
+		stateStageData := stateStage.(map[string]interface{})
+		foundInPipeline := false
+		for _, pipelineStage := range pipelineStages {
+			pipelineStageData := pipelineStage.(map[string]interface{})
+			if stateStageData["name"] == pipelineStageData["name"] && stateStageData["category"] == pipelineStageData["category"] {
+				foundInPipeline = true
+				break
+			}
+		}
+		if foundInPipeline || stateStageData["exclude"].(bool) {
+			finalStages = append(finalStages, stateStage)
+		}
+	}
+	
+	if err := d.Set("stage", finalStages); err != nil {
 		return err
 	}
 
