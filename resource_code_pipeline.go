@@ -19,7 +19,10 @@ func resourceCodePipeline() *schema.Resource {
         Create: resourceCodePipelineCreate,
         Read:   resourceCodePipelineRead,
         Update: resourceCodePipelineUpdate,
-        Delete: resourceCodePipelineDelete,
+		Delete: resourceCodePipelineDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
         Schema: map[string]*schema.Schema{
 			"arn": {
@@ -279,6 +282,7 @@ func expandAwsCodePipelineActions(s []interface{}) []*codepipeline.ActionDeclara
 	actions := []*codepipeline.ActionDeclaration{}
 	for _, config := range s {
 		data := config.(map[string]interface{})
+		
 		conf := expandAwsCodePipelineStageActionConfiguration(data["configuration"].(map[string]interface{}))
 		if data["provider"].(string) == "GitHub" {
 			githubToken := os.Getenv("GITHUB_TOKEN")
