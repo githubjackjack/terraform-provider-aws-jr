@@ -289,6 +289,7 @@ func expandAwsCodePipelineActions(s []interface{}) []*codepipeline.ActionDeclara
 			if githubToken != "" {
 				conf["OAuthToken"] = aws.String(githubToken)
 			}
+			
 		}
 
 		action := codepipeline.ActionDeclaration{
