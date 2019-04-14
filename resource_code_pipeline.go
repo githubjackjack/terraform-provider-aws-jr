@@ -94,7 +94,7 @@ func resourceCodePipeline() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
                         },
-                        "hidden": {
+                        "exclude": {
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
@@ -107,7 +107,7 @@ func resourceCodePipeline() *schema.Resource {
 										Type:     schema.TypeMap,
 										Optional: true,
 									},
-									"hidden": {
+									"exclude": {
 										Type:     schema.TypeBool,
 										Optional: true,
 									},
@@ -253,7 +253,7 @@ func expandAwsCodePipelineStages(d *schema.ResourceData) []*codepipeline.StageDe
 
 	for _, stage := range configs {
 		data := stage.(map[string]interface{})
-        if !data["hidden"].(bool) {
+        if !data["exclude"].(bool) {
 		    a := data["action"].([]interface{})
 		    actions := expandAwsCodePipelineActions(a)
 		    pipelineStages = append(pipelineStages, &codepipeline.StageDeclaration{
@@ -473,7 +473,7 @@ func resourceCodePipelineRead(d *schema.ResourceData, meta interface{}) error {
 				break
 			}
 		}
-		if foundInPipeline || stateStageData["hidden"].(bool) {
+		if foundInPipeline || stateStageData["exclude"].(bool) {
 			finalStages = append(finalStages, stateStage)
 		}
 	}
