@@ -1,5 +1,5 @@
 # terraform-provider-awsjr
-Terraform provider adding additional functionality to the AWS codepipeline provider.
+Terraform provider adding additional functionality to the AWS codepipeline provisioner.
 
 # Setup
 Either download the accompanying binary or compile from source.  Then install the compiled plugin 
