@@ -214,7 +214,6 @@ func expandAwsCodePipeline(d *schema.ResourceData) *codepipeline.PipelineDeclara
 	}
 	return &pipeline
 }
-
 func expandAwsCodePipelineArtifactStore(d *schema.ResourceData) *codepipeline.ArtifactStore {
 	configs := d.Get("artifact_store").([]interface{})
 	data := configs[0].(map[string]interface{})
