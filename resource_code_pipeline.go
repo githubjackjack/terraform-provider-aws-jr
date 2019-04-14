@@ -91,7 +91,7 @@ func resourceCodePipeline() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
                         },
-                        "exclude": {
+                        "hidden": {
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
@@ -104,7 +104,7 @@ func resourceCodePipeline() *schema.Resource {
 										Type:     schema.TypeMap,
 										Optional: true,
 									},
-									"exclude": {
+									"hidden": {
 										Type:     schema.TypeBool,
 										Optional: true,
 									},
@@ -251,7 +251,7 @@ func expandAwsCodePipelineStages(d *schema.ResourceData) []*codepipeline.StageDe
 
 	for _, stage := range configs {
 		data := stage.(map[string]interface{})
-        if !data["exclude"].(bool) {
+        if !data["hidden"].(bool) {
 		    a := data["action"].([]interface{})
 		    actions := expandAwsCodePipelineActions(a)
 		    pipelineStages = append(pipelineStages, &codepipeline.StageDeclaration{
@@ -279,49 +279,47 @@ func expandAwsCodePipelineActions(s []interface{}) []*codepipeline.ActionDeclara
 	actions := []*codepipeline.ActionDeclaration{}
 	for _, config := range s {
 		data := config.(map[string]interface{})
-		if !data["exclude"].(bool) {
-			conf := expandAwsCodePipelineStageActionConfiguration(data["configuration"].(map[string]interface{}))
-			if data["provider"].(string) == "GitHub" {
-				githubToken := os.Getenv("GITHUB_TOKEN")
-				if githubToken != "" {
-					conf["OAuthToken"] = aws.String(githubToken)
-				}
+		conf := expandAwsCodePipelineStageActionConfiguration(data["configuration"].(map[string]interface{}))
+		if data["provider"].(string) == "GitHub" {
+			githubToken := os.Getenv("GITHUB_TOKEN")
+			if githubToken != "" {
+				conf["OAuthToken"] = aws.String(githubToken)
 			}
-
-			action := codepipeline.ActionDeclaration{
-				ActionTypeId: &codepipeline.ActionTypeId{
-					Category: aws.String(data["category"].(string)),
-					Owner:    aws.String(data["owner"].(string)),
-
-					Provider: aws.String(data["provider"].(string)),
-					Version:  aws.String(data["version"].(string)),
-				},
-				Name:          aws.String(data["name"].(string)),
-				Configuration: conf,
-			}
-
-			oa := data["output_artifacts"].([]interface{})
-			if len(oa) > 0 {
-				outputArtifacts := expandAwsCodePipelineActionsOutputArtifacts(oa)
-				action.OutputArtifacts = outputArtifacts
-
-			}
-			ia := data["input_artifacts"].([]interface{})
-			if len(ia) > 0 {
-				inputArtifacts := expandAwsCodePipelineActionsInputArtifacts(ia)
-				action.InputArtifacts = inputArtifacts
-
-			}
-			ra := data["role_arn"].(string)
-			if ra != "" {
-				action.RoleArn = aws.String(ra)
-			}
-			ro := data["run_order"].(int)
-			if ro > 0 {
-				action.RunOrder = aws.Int64(int64(ro))
-			}
-			actions = append(actions, &action)
 		}
+
+		action := codepipeline.ActionDeclaration{
+			ActionTypeId: &codepipeline.ActionTypeId{
+				Category: aws.String(data["category"].(string)),
+				Owner:    aws.String(data["owner"].(string)),
+
+				Provider: aws.String(data["provider"].(string)),
+				Version:  aws.String(data["version"].(string)),
+			},
+			Name:          aws.String(data["name"].(string)),
+			Configuration: conf,
+		}
+
+		oa := data["output_artifacts"].([]interface{})
+		if len(oa) > 0 {
+			outputArtifacts := expandAwsCodePipelineActionsOutputArtifacts(oa)
+			action.OutputArtifacts = outputArtifacts
+
+		}
+		ia := data["input_artifacts"].([]interface{})
+		if len(ia) > 0 {
+			inputArtifacts := expandAwsCodePipelineActionsInputArtifacts(ia)
+			action.InputArtifacts = inputArtifacts
+
+		}
+		ra := data["role_arn"].(string)
+		if ra != "" {
+			action.RoleArn = aws.String(ra)
+		}
+		ro := data["run_order"].(int)
+		if ro > 0 {
+			action.RunOrder = aws.Int64(int64(ro))
+		}
+		actions = append(actions, &action)
 	}
 	return actions
 }
@@ -471,7 +469,7 @@ func resourceCodePipelineRead(d *schema.ResourceData, meta interface{}) error {
 				break
 			}
 		}
-		if foundInPipeline || stateStageData["exclude"].(bool) {
+		if foundInPipeline || stateStageData["hidden"].(bool) {
 			finalStages = append(finalStages, stateStage)
 		}
 	}
