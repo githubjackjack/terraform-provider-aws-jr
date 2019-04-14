@@ -31,6 +31,7 @@ resource "awsjr_code_pipeline" "main" {
     ...
   }
 }
+```
 
 > Note:  An excluded stage is still created in the state file in order to retain properties.  It just additionally
 contains an _exclude_ property that excludes it from the pipeline.
