@@ -171,7 +171,7 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"awsjr_code_pipeline": resourceCodePipeline(),
+			"awsjr_code_pipeline": resourceAwsCodePipeline(),
 		},
 
 		ConfigureFunc: providerConfigure,

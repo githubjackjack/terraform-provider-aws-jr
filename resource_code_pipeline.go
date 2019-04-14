@@ -14,12 +14,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 )
 
-func resourceCodePipeline() *schema.Resource {
+func resourceAwsCePipeline() *schema.Resource {
     return &schema.Resource{
-        Create: resourceCodePipelineCreate,
-        Read:   resourceCodePipelineRead,
-        Update: resourceCodePipelineUpdate,
-		Delete: resourceCodePipelineDelete,
+        Create: resourceAwsCodePipelineCreate,
+		Read:   resourceAwsCodePipelineRead,
+		Update: resourceAwsCodePipelineUpdate,
+		Delete: resourceAwsCodePipelineDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -173,7 +173,7 @@ func resourceCodePipeline() *schema.Resource {
 	}
 }
 
-func resourceCodePipelineCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceAwsCePipelineCreate(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).codepipelineconn
 	params := &codepipeline.CreatePipelineInput{
 		Pipeline: expandAwsCodePipeline(d),
@@ -199,7 +199,7 @@ func resourceCodePipelineCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	d.SetId(*resp.Pipeline.Name)
-	return resourceCodePipelineRead(d, meta)
+	return resourceAwsCePipelineRead(d, meta)
 }
 
 func expandAwsCodePipeline(d *schema.ResourceData) *codepipeline.PipelineDeclaration {
@@ -428,7 +428,7 @@ func flattenAwsCodePipelineActionsInputArtifacts(artifacts []*codepipeline.Input
 	return values
 }
 
-func resourceCodePipelineRead(d *schema.ResourceData, meta interface{}) error {
+func resourceAwsCePipelineRead(d *schema.ResourceData, meta interface{}) error {
 	stages := d.Get("stage").([]interface{})
 	stateStages := []interface{}{}
 
@@ -488,7 +488,7 @@ func resourceCodePipelineRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceCodePipelineUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceAwsCePipelineUpdate(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).codepipelineconn
 
 	pipeline := expandAwsCodePipeline(d)
@@ -503,10 +503,10 @@ func resourceCodePipelineUpdate(d *schema.ResourceData, meta interface{}) error 
 			d.Id(), err)
 	}
 
-	return resourceCodePipelineRead(d, meta)
+	return resourceAwsCePipelineRead(d, meta)
 }
 
-func resourceCodePipelineDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceAwsCePipelineDelete(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).codepipelineconn
 
 	_, err := conn.DeletePipeline(&codepipeline.DeletePipelineInput{
