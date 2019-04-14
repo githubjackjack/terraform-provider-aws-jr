@@ -18,7 +18,7 @@ provider "awsjr" {
 ```
 
 The resource awsjr_code_pipeline can now be used in the exact same manner as [aws_codepipeline](https://www.terraform.io/docs/providers/aws/r/codepipeline.html), with
-the additional ability to exclude a stage from the pipeline using the _exclude_ property.
+the additional ability to conditionally exclude a stage from the pipeline using the _exclude_ property.
 
 Example:
 ```bash
